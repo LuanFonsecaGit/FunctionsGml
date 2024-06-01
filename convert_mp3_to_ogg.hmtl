@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 to OGG Converter</title>
+</head>
+<body>
+    <h1>MP3 to OGG Converter</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".mp3" required>
+        <button type="submit">Convert</button>
+    </form>
+    <div id="downloadLink"></div>
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const fileField = document.querySelector('input[type="file"]');
+
+            formData.append('file', fileField.files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'converted.ogg';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.getElementById('downloadLink').innerHTML = 'Download Completed';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
